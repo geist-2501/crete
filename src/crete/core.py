@@ -5,7 +5,6 @@ from collections import defaultdict
 from typing import List, Dict, Tuple, Callable, Any
 
 import gymnasium as gym
-import matplotlib.pyplot as plt
 import numpy as np
 from rich import print
 
@@ -41,8 +40,10 @@ def play_agent(
 
         if env.render_mode != "human":
             if env.render_mode == "rgb_array":
-                plt.imshow(env.render())
-                plt.pause(0.01)
+                ...
+                # TODO remove PLT requirements.
+                # plt.imshow(env.render())
+                # plt.pause(0.01)
             else:
                 env.render()
 
@@ -137,7 +138,6 @@ def create_env_factory(env_name, wrapper_name=None, render_mode='rgb_array', env
 def graph_agent(agent_id: str, artifacts: Dict, config: ProfileConfig):
     graphing_wrapper = get_agent_graphing(agent_id)
     graphing_wrapper(artifacts, config)
-    plt.show()
 
 
 def evaluate_agent(

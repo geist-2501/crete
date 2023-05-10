@@ -2,7 +2,7 @@ from typing import List, Optional
 
 import numpy as np
 import typer
-from gym.wrappers import RecordVideo
+from gymnasium.wrappers import RecordVideo
 from rich import print
 
 from ..profile import ProfileConfig
