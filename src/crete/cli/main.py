@@ -30,7 +30,7 @@ __app_logo__ = r"""
  """
 
 
-def talos_app():
+def crete_app():
     app(prog_name=__app_name__)
 
 

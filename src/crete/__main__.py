@@ -1,3 +1,3 @@
-from crete import talos_app
+from crete import crete_app
 
-talos_app()
+crete_app()
