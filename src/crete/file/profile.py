@@ -1,11 +1,10 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, List, TypeVar, Optional
 
 import yaml
 from yaml import Loader
 
-from .error import ProfilePropertyNotFound
-from .util import parse_int_list
+from ..error import ProfilePropertyNotFound
 
 
 class ProfileConfig:
@@ -26,13 +25,7 @@ class ProfileConfig:
         return self._get(name, self._to_bool, required)
 
     def getlist(self, name: str, required=True) -> List:
-        raw_list = self._get(name, required=required)
-        if type(raw_list) is str:
-            return parse_int_list(raw_list)
-        elif type(raw_list) is list:
-            return raw_list
-
-        raise RuntimeError(f"Property '{name}' was not a parsable list.")
+        return self._get(name, required=required)
 
     def _get(self, name: str, conv=None, required=True):
         if name not in self._conf:

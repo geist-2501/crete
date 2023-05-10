@@ -2,7 +2,7 @@ import os
 import unittest
 
 from src.crete.error import ProfilePropertyNotFound
-from src.crete.profile import read_profile
+from src.crete.file.profile import read_profile
 
 
 class ProfileTest(unittest.TestCase):

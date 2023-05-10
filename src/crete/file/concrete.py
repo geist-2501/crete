@@ -1,8 +1,9 @@
-from typing import Any, Dict, List, Union, Tuple, Callable
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Callable
 
 import numpy as np
-from .error import TalfileLoadError
+
+from crete.error import TalfileLoadError
 
 
 @dataclass()
@@ -85,11 +86,10 @@ class TalFile:
             else:
                 raise RuntimeError("Invalid path!")
 
-
-def read_talfile(path: str) -> TalFile:
-    try:
-        with open(path, 'rb') as file:
-            data = torch.load(file)
-            return TalFile(**data)
-    except OSError as ex:
-        raise TalfileLoadError(ex)
+    @classmethod
+    def read(cls, path: str):
+        try:
+            with open(path, 'rb') as file:
+                raise NotImplementedError
+        except OSError as ex:
+            raise TalfileLoadError(ex)

@@ -5,12 +5,12 @@ import typer
 from gymnasium.wrappers import RecordVideo
 from rich import print
 
-from ..profile import ProfileConfig
+from ..file.profile import ProfileConfig
 from .cli_utils import _convert_to_key_value_list
 from ..core import create_env_factory, create_agent, play_agent, evaluate_agents, graph_agent, graph_env_results, \
     dump_scores_to_csv
 from ..error import TalfileLoadError, AgentNotFound
-from ..file import read_talfile
+from ..file.concrete import TalFile
 
 talfile_app = typer.Typer()
 
@@ -25,7 +25,7 @@ def doc():
 def view(path: str):
     """View the metadata of a talfile"""
     try:
-        talfile = read_talfile(path)
+        talfile = TalFile.read(path)
     except TalfileLoadError as ex:
         print(f"Couldn't load talfile {path}, " + str(ex))
         raise typer.Abort()
@@ -88,7 +88,7 @@ def replay(
     opt_env_args = _convert_to_key_value_list(opt_env_args)
 
     try:
-        talfile = read_talfile(path)
+        talfile = TalFile.read(path)
     except TalfileLoadError as ex:
         print(f"Couldn't load talfile {path}, " + str(ex))
         raise typer.Abort()
@@ -136,7 +136,7 @@ def replay(
 def graph(path: str):
     """Produce graphs of the agent gather during training."""
     try:
-        talfile = read_talfile(path)
+        talfile = TalFile.read(path)
     except TalfileLoadError as ex:
         print(f"Couldn't load talfile {path}, " + str(ex))
         raise typer.Abort()
@@ -180,7 +180,7 @@ def compare(
         print(f" > {agent_talfile}... ", end="")
         try:
             # Load talfile.
-            talfile = read_talfile(agent_talfile)
+            talfile = TalFile.read(agent_talfile)
 
             # Recreate the env factory and wrapper.
             env_args = {**talfile.env_args, **opt_env_args}
@@ -245,7 +245,7 @@ def prune(
     try:
         # Load talfile.
         print(f" > Loading {arg_talfile_path}... ", end="")
-        talfile = read_talfile(arg_talfile_path)
+        talfile = TalFile.read(arg_talfile_path)
         print(f"[bold green]success![/]")
 
     except RuntimeError as ex:
@@ -296,7 +296,7 @@ def squeeze(
     try:
         # Load talfile.
         print(f" > Loading {arg_talfile_path}... ", end="")
-        talfile = read_talfile(arg_talfile_path)
+        talfile = TalFile.read(arg_talfile_path)
         print(f"[bold green]success![/]")
 
     except RuntimeError as ex:

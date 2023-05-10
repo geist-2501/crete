@@ -1,5 +1,7 @@
 import configparser
 import csv
+import importlib
+import os
 import time
 from collections import defaultdict
 from typing import List, Dict, Tuple, Callable, Any
@@ -8,12 +10,13 @@ import gymnasium as gym
 import numpy as np
 from rich import print
 
-from .profile import ProfileConfig
-from .agent import Agent
-from .error import *
-from .file import TalFile
-from .registration import get_agent, get_wrapper, get_agent_graphing, get_env_graphing_wrapper
-from .util import std_err, to_camel_case
+from crete.file.crete_config import CreteConfig
+from crete.file.profile import ProfileConfig
+from crete.agent import Agent
+from crete.error import *
+from crete.file.concrete import TalFile
+from crete.registration import get_agent, get_wrapper, get_agent_graphing, get_env_graphing_wrapper
+from crete.util import std_err, to_camel_case, print_err
 
 
 def play_agent(
@@ -251,3 +254,15 @@ def dump_scores_to_csv(path: str, names, scores):
     with open(path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, quoting=csv.QUOTE_MINIMAL)
         writer.writerows(data)
+
+
+def load_extra_modules():
+    # Load .crete file.
+    config = CreteConfig.read(CreteConfig.conf_filename)
+
+    # Import modules to trigger registration.
+    for extra_module in config.extra_modules:
+        try:
+            importlib.import_module(extra_module)
+        except ModuleNotFoundError as e:
+            print_err(f"Could not find {extra_module}.")

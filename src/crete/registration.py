@@ -5,7 +5,7 @@ import gymnasium as gym
 from gymnasium.envs.registration import register
 
 from .agent import Agent
-from .profile import ProfileConfig
+from .file.profile import ProfileConfig
 from .error import AgentNotFound, WrapperNotFound
 
 

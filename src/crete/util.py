@@ -1,7 +1,12 @@
 from collections import defaultdict
 from typing import List
+from rich import print
 
 import numpy as np
+
+
+def print_err(text: str):
+    print(f"[bold red]Error[/]\t{text}")
 
 
 def pad(array, pad_value=0) -> np.ndarray:
