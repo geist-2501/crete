@@ -2,7 +2,6 @@ from typing import Any, Dict, List, Union, Tuple, Callable
 from dataclasses import dataclass, field
 
 import numpy as np
-import torch
 from .error import TalfileLoadError
 
 
@@ -19,15 +18,17 @@ class TalFile:
 
     def write(self, path: str):
         with open(path, 'wb') as file:
-            torch.save({
-                "id": self.id,
-                "agent_data": self.agent_data,
-                "training_artifacts": self.training_artifacts,
-                "config": self.config,
-                "used_wrappers": self.used_wrappers,
-                "env_name": self.env_name,
-                "env_args": self.env_args
-            }, file)
+            ...
+            # TODO Redo this without pytorch.
+            # torch.save({
+            #     "id": self.id,
+            #     "agent_data": self.agent_data,
+            #     "training_artifacts": self.training_artifacts,
+            #     "config": self.config,
+            #     "used_wrappers": self.used_wrappers,
+            #     "env_name": self.env_name,
+            #     "env_args": self.env_args
+            # }, file)
 
     def get_artifact(self, path: List[str]) -> Any:
         root = self.training_artifacts

@@ -1,10 +1,9 @@
 import os.path
-from typing import Optional
 
 import typer
 from rich import print
 
-from ..core import get_device, create_env_factory, create_agent, create_save_callback
+from ..core import create_env_factory, create_agent, create_save_callback
 from ..file import TalFile
 from ..profile import read_profile, Profile
 
@@ -101,15 +100,12 @@ def _train_with_profile(
         print(f"Profile {target_profile.name} already exists! To overwrite, set override to true.")
         return
 
-    device = get_device()
-    print(f"Using device [bold white]{device}.[/]")
-
     env_factory = create_env_factory(
         target_profile.env_id,
         target_profile.env_wrapper,
         env_args=target_profile.env_args
     )
-    agent, training_wrapper = create_agent(env_factory, target_profile.agent_id, device=device)
+    agent, training_wrapper = create_agent(env_factory, target_profile.agent_id)
 
     print(f"\nProceeding to train a {target_profile.agent_id} on {target_profile.env_id} with config values:")
     print(target_profile.config.to_dict())

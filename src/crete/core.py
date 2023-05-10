@@ -4,10 +4,9 @@ import time
 from collections import defaultdict
 from typing import List, Dict, Tuple, Callable, Any
 
-import gym
+import gymnasium as gym
 import matplotlib.pyplot as plt
 import numpy as np
-import torch
 from rich import print
 
 from .profile import ProfileConfig
@@ -100,11 +99,7 @@ def load_config(config_path: str) -> configparser.ConfigParser:
     return config
 
 
-def get_device():
-    return torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-
-def create_agent(env_factory, agent_name, device: str = get_device()):
+def create_agent(env_factory, agent_name, device: str = 'cpu'):
 
     agent_factory, training_wrapper = get_agent(agent_name)
     env = env_factory(0)

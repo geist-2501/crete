@@ -1,28 +1,33 @@
 from typing import Optional, List
 
 import typer
-from gym.utils.play import play as gym_play
+from gymnasium.utils.play import play as gym_play
 from rich import print
 
 from .cli_utils import _convert_to_key_value_list
-from .config import app as config_app
 from .list import app as list_app
 from .talfile import talfile_app
 from .profile import profile_app
-from ..core import load_config, create_env_factory, get_device, create_agent, create_save_callback
+from ..core import load_config, create_env_factory, create_agent, create_save_callback
 from ..global_state import get_cli_state
 from ..error import *
 from ..file import TalFile
 from ..profile import ProfileConfig
 
 app = typer.Typer()
-app.add_typer(config_app, name="config")
 app.add_typer(list_app, name="list")
 app.add_typer(talfile_app, name="talfile")
 app.add_typer(profile_app, name="profile")
 
 __app_name__ = "talos"
 __version__ = "0.1.0"
+__app_logo__ = r"""
+               _       
+  ___ _ __ ___| |_ ___ 
+ / __| '__/ _ \ __/ _ \
+| (__| | |  __/ ||  __/
+ \___|_|  \___|\__\___|
+ """
 
 
 def talos_app():
@@ -31,14 +36,8 @@ def talos_app():
 
 def _version_callback(value: bool) -> None:
     if value:
-        typer.echo(r"""
- _____  _    _     ___  ____  
-|_   _|/ \  | |   / _ \/ ___| 
-  | | / _ \ | |  | | | \___ \ 
-  | |/ ___ \| |__| |_| |___) |
-  |_/_/   \_\_____\___/|____/
-  RL agent training assistant""")
-        print(f"[bold green]  v{__version__}[/]")
+        typer.echo(__app_logo__)
+        print(f"[bold black]RL Training Assistant[/] [green]v{__version__}[/]")
         raise typer.Exit()
 
 
@@ -110,9 +109,6 @@ def train(
     """Train an agent on a given environment."""
     opt_env_args = _convert_to_key_value_list(opt_env_args)
 
-    device = get_device()
-    print(f"Using device [bold white]{device}.[/]")
-
     # Load config.
     try:
         print(f"Loading config `{opt_config}`... ", end="")
@@ -123,7 +119,7 @@ def train(
         raise typer.Abort()
 
     env_factory = create_env_factory(opt_env, opt_wrapper, env_args=opt_env_args, base_seed=opt_seed)
-    agent, training_wrapper = create_agent(env_factory, opt_agent, device=device)
+    agent, training_wrapper = create_agent(env_factory, opt_agent)
 
     config_section = config[opt_agent] if opt_agent in config.sections() else config['DEFAULT']
     agent_config = ProfileConfig(dict(config_section), {})

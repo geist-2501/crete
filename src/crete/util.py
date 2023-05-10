@@ -4,7 +4,6 @@ from typing import List
 import numpy as np
 
 
-# TODO Rewrite this!
 def pad(array, pad_value=0) -> np.ndarray:
     dimensions = get_max_shape(array)
     result = np.full(dimensions, pad_value)

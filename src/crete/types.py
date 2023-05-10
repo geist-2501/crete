@@ -1,7 +1,7 @@
 import configparser
 from typing import Callable, Dict, Optional, Any
 
-from gym import Env
+from gymnasium import Env
 
 from .agent import Agent
 

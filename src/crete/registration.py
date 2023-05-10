@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Dict, Callable, Tuple, List
 
-import gym
-from gym.envs.registration import register
+import gymnasium as gym
+from gymnasium.envs.registration import register
 
 from .agent import Agent
 from .profile import ProfileConfig
