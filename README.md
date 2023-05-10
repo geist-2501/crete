@@ -10,6 +10,12 @@ Reinforcement Learning CLI assistant.
 
 ```
 
+## Installation
+
+Crete is not released for public use yet, and is not available of PyPI. 
+
+## Introduction
+
 Crete is a CLI for RL training. 
 Named after the island that Talos, the first AI in human mythology, walked upon.
 
