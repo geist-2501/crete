@@ -1,4 +1,5 @@
 import typer
+from rich import print
 
 from crete.file.crete_config import CreteConfig
 from crete.util import print_err
@@ -44,10 +45,3 @@ def remove(
 
     # Overwrite it.
     conf.write(CreteConfig.conf_filename)
-
-
-@module_app.command(name="list")
-def list_modules():
-    # Load the .crete file.
-    conf = CreteConfig.try_read(CreteConfig.conf_filename)
-    print(conf.extra_modules)

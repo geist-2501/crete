@@ -30,7 +30,7 @@ class ProfileConfig:
     def _get(self, name: str, conv=None, required=True):
         if name not in self._conf:
             if required:
-                raise ProfilePropertyNotFound
+                raise ProfilePropertyNotFound(name)
             else:
                 return None
         else:

@@ -1,7 +1,6 @@
 import configparser
 import csv
 import importlib
-import os
 import time
 from collections import defaultdict
 from typing import List, Dict, Tuple, Callable, Any
@@ -9,12 +8,13 @@ from typing import List, Dict, Tuple, Callable, Any
 import gymnasium as gym
 import numpy as np
 from rich import print
+from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from crete.file.crete_config import CreteConfig
 from crete.file.profile import ProfileConfig
 from crete.agent import Agent
 from crete.error import *
-from crete.file.concrete import TalFile
+from crete.file.concrete import ConcreteFile
 from crete.registration import get_agent, get_wrapper, get_agent_graphing, get_env_graphing_wrapper
 from crete.util import std_err, to_camel_case, print_err
 
@@ -205,7 +205,7 @@ def evaluate_agent(
 
 def create_save_callback(id: str, config: Dict, used_wrappers: str, env_name: str, env_args: Dict) -> Callable:
     def callback(agent_data: Any, training_artifacts: Dict, step: int, prefix: str = None):
-        talfile = TalFile(
+        concfile = ConcreteFile(
             id=id,
             agent_data=agent_data,
             training_artifacts=training_artifacts,
@@ -224,7 +224,7 @@ def create_save_callback(id: str, config: Dict, used_wrappers: str, env_name: st
         ]
         if prefix:
             filename_parts.insert(0, prefix)
-        talfile.write('-'.join(filename_parts))
+        concfile.write('-'.join(filename_parts))
 
     return callback
 
@@ -257,12 +257,14 @@ def dump_scores_to_csv(path: str, names, scores):
 
 
 def load_extra_modules():
-    # Load .crete file.
-    config = CreteConfig.read(CreteConfig.conf_filename)
+    with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), transient=True) as progress:
+        progress.add_task("Loading modules...", total=None)
+        # Load .crete file.
+        config = CreteConfig.read(CreteConfig.conf_filename)
 
-    # Import modules to trigger registration.
-    for extra_module in config.extra_modules:
-        try:
-            importlib.import_module(extra_module)
-        except ModuleNotFoundError as e:
-            print_err(f"Could not find {extra_module}.")
+        # Import modules to trigger registration.
+        for extra_module in config.extra_modules:
+            try:
+                importlib.import_module(extra_module)
+            except ModuleNotFoundError as e:
+                print_err(f"Could not find {extra_module}.")

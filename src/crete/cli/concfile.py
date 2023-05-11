@@ -9,36 +9,36 @@ from ..file.profile import ProfileConfig
 from .cli_utils import _convert_to_key_value_list
 from ..core import create_env_factory, create_agent, play_agent, evaluate_agents, graph_agent, graph_env_results, \
     dump_scores_to_csv
-from ..error import TalfileLoadError, AgentNotFound
-from ..file.concrete import TalFile
+from ..error import ConcfileLoadError, AgentNotFound
+from ..file.concrete import ConcreteFile
 
-talfile_app = typer.Typer()
+concfile_app = typer.Typer()
 
 
-@talfile_app.callback()
+@concfile_app.callback()
 def doc():
-    """Perform operations on talfiles, like replaying and viewing."""
+    """Perform operations on Concrete files (.cnc), like replaying and viewing."""
     pass
 
 
-@talfile_app.command()
+@concfile_app.command()
 def view(path: str):
-    """View the metadata of a talfile"""
+    """View the metadata of a concfile"""
     try:
-        talfile = TalFile.read(path)
-    except TalfileLoadError as ex:
-        print(f"Couldn't load talfile {path}, " + str(ex))
+        concfile = ConcreteFile.read(path)
+    except ConcfileLoadError as ex:
+        print(f"Couldn't load concfile {path}, " + str(ex))
         raise typer.Abort()
 
-    print(f"[bold white]Agent name[/]:       {talfile.id}")
-    print(f"[bold white]Environment used[/]: {talfile.env_name}")
-    print(f"[bold white]Wrapper used[/]:     {talfile.used_wrappers}")
-    print(f"[bold white]Env args[/]:         {talfile.env_args}")
+    print(f"[bold white]Agent name[/]:       {concfile.id}")
+    print(f"[bold white]Environment used[/]: {concfile.env_name}")
+    print(f"[bold white]Wrapper used[/]:     {concfile.used_wrappers}")
+    print(f"[bold white]Env args[/]:         {concfile.env_args}")
     print("[bold white]Configuration used[/]:")
-    print(talfile.config)
+    print(concfile.config)
 
 
-@talfile_app.command()
+@concfile_app.command()
 def replay(
         path: str,
         opt_env: str = typer.Option(
@@ -88,26 +88,26 @@ def replay(
     opt_env_args = _convert_to_key_value_list(opt_env_args)
 
     try:
-        talfile = TalFile.read(path)
-    except TalfileLoadError as ex:
-        print(f"Couldn't load talfile {path}, " + str(ex))
+        concfile = ConcreteFile.read(path)
+    except ConcfileLoadError as ex:
+        print(f"Couldn't load concfile {path}, " + str(ex))
         raise typer.Abort()
 
     if opt_env is None:
-        opt_env = talfile.env_name
+        opt_env = concfile.env_name
     else:
-        print(f"Overwriting environment specified in talfile ({talfile.env_name}) with {opt_env}")
+        print(f"Overwriting environment specified in concfile ({concfile.env_name}) with {opt_env}")
 
     if opt_wrapper is None:
-        opt_wrapper = talfile.used_wrappers
+        opt_wrapper = concfile.used_wrappers
     else:
-        print(f"Overwriting wrapper specified in talfile ({talfile.used_wrappers}) with {opt_wrapper}")
+        print(f"Overwriting wrapper specified in concfile ({concfile.used_wrappers}) with {opt_wrapper}")
 
-    opt_env_args = {**opt_env_args, **talfile.env_args}
+    opt_env_args = {**opt_env_args, **concfile.env_args}
 
     env_factory = create_env_factory(opt_env, opt_wrapper, render_mode=opt_render, env_args=opt_env_args)
-    agent, _ = create_agent(env_factory, talfile.id)
-    agent.load(talfile.agent_data)
+    agent, _ = create_agent(env_factory, concfile.id)
+    agent.load(concfile.agent_data)
 
     env = env_factory(opt_seed)
 
@@ -132,23 +132,23 @@ def replay(
     env.close()
 
 
-@talfile_app.command()
+@concfile_app.command()
 def graph(path: str):
-    """Produce graphs of the agent gather during training."""
+    """Produce graphs of the agent gathered during training."""
     try:
-        talfile = TalFile.read(path)
-    except TalfileLoadError as ex:
-        print(f"Couldn't load talfile {path}, " + str(ex))
+        concfile = ConcreteFile.read(path)
+    except ConcfileLoadError as ex:
+        print(f"Couldn't load concfile {path}, " + str(ex))
         raise typer.Abort()
 
-    graph_agent(talfile.id, talfile.training_artifacts, ProfileConfig(talfile.config, {}))
+    graph_agent(concfile.id, concfile.training_artifacts, ProfileConfig(concfile.config, {}))
 
 
-@talfile_app.command()
+@concfile_app.command()
 def compare(
         paths: List[str] = typer.Argument(
             None,
-            help="Talfiles of agents to compare against each other."
+            help="Concfiles of agents to compare against each other."
         ),
         opt_env_args: List[str] = typer.Option(
             [],
@@ -176,29 +176,29 @@ def compare(
     opt_env_args = _convert_to_key_value_list(opt_env_args)
 
     loaded_agents = []
-    for agent_talfile in paths:
-        print(f" > {agent_talfile}... ", end="")
+    for agent_concfile in paths:
+        print(f" > {agent_concfile}... ", end="")
         try:
-            # Load talfile.
-            talfile = TalFile.read(agent_talfile)
+            # Load concfile.
+            concfile = ConcreteFile.read(agent_concfile)
 
             # Recreate the env factory and wrapper.
-            env_args = {**talfile.env_args, **opt_env_args}
-            agent_env_factory = create_env_factory(talfile.env_name, talfile.used_wrappers, env_args=env_args)
-            agent, _ = create_agent(agent_env_factory, talfile.id)
-            agent.load(talfile.agent_data)
+            env_args = {**concfile.env_args, **opt_env_args}
+            agent_env_factory = create_env_factory(concfile.env_name, concfile.used_wrappers, env_args=env_args)
+            agent, _ = create_agent(agent_env_factory, concfile.id)
+            agent.load(concfile.agent_data)
             loaded_agents.append({
-                "agent_name": f"{agent_talfile} ({talfile.id})",
-                "agent_id": talfile.id,
+                "agent_name": f"{agent_concfile} ({concfile.id})",
+                "agent_id": concfile.id,
                 "agent": agent,
-                "env_name": talfile.env_name,
+                "env_name": concfile.env_name,
                 "env_factory": agent_env_factory
             })
-            extra_info = f"Uses {talfile.env_name}"
-            extra_info += f" with wrapper {talfile.used_wrappers}." if talfile.used_wrappers else "."
+            extra_info = f"Uses {concfile.env_name}"
+            extra_info += f" with wrapper {concfile.used_wrappers}." if concfile.used_wrappers else "."
             print(f"[bold green]success![/] {extra_info}")
         except RuntimeError as ex:
-            print("[bold red]failed![/] Couldn't load .tal file. " + str(ex))
+            print("[bold red]failed![/] Couldn't load .conc file. " + str(ex))
         except AgentNotFound:
             print("[bold red]failed![/] Couldn't find agent definition. Make sure it's been registered.")
 
@@ -220,11 +220,11 @@ def compare(
             dump_scores_to_csv(f"{opt_save_as}.csv", [a["agent_id"] for a in loaded_agents], scores)
 
 
-@talfile_app.command()
+@concfile_app.command()
 def prune(
-        arg_talfile_path: str = typer.Argument(
+        arg_concfile_path: str = typer.Argument(
             ...,
-            help="Path to talfile to edit."
+            help="Path to concfile to edit."
         ),
         opt_artifact_name: Optional[str] = typer.Option(
             None,
@@ -240,22 +240,22 @@ def prune(
         )
 ):
     """
-    Removes data from a talfile's training artifacts to reduce it's filesize.
+    Removes data from a concfile's training artifacts to reduce it's filesize.
     """
     try:
-        # Load talfile.
-        print(f" > Loading {arg_talfile_path}... ", end="")
-        talfile = TalFile.read(arg_talfile_path)
+        # Load concfile.
+        print(f" > Loading {arg_concfile_path}... ", end="")
+        concfile = ConcreteFile.read(arg_concfile_path)
         print(f"[bold green]success![/]")
 
     except RuntimeError as ex:
-        print("[bold red]failed![/] Couldn't load .tal file. " + str(ex))
+        print("[bold red]failed![/] Couldn't load .conc file. " + str(ex))
         raise typer.Abort()
 
     if opt_artifact_name is None:
         # List sizes.
-        print("Talfile size:")
-        for artifact_name, artifact_values in talfile.training_artifacts.items():
+        print("Concfile size:")
+        for artifact_name, artifact_values in concfile.training_artifacts.items():
             if type(artifact_values) is tuple:
                 print(f" {artifact_name} -> ", end="")
                 for tuple_val in artifact_values:
@@ -266,7 +266,7 @@ def prune(
     else:
         assert opt_prune_on is not None, "Must have a prune on rate if pruning!"
         path = opt_artifact_name.split('.')
-        artifact_part = talfile.get_artifact(path)
+        artifact_part = concfile.get_artifact(path)
 
         artifact_part_len = len(artifact_part)
         print(f" {opt_artifact_name} -> {artifact_part_len} entries")
@@ -277,33 +277,33 @@ def prune(
 
         pruned_part = np.array([x for i, x in enumerate(artifact_part) if i % opt_prune_on == 0])
 
-        talfile.set_artifact(path, pruned_part)
-        talfile.write(arg_talfile_path)
+        concfile.set_artifact(path, pruned_part)
+        concfile.write(arg_concfile_path)
 
         print(f"Prune complete, left with {len(pruned_part)} entries.")
 
 
-@talfile_app.command()
+@concfile_app.command()
 def squeeze(
-        arg_talfile_path: str = typer.Argument(
+        arg_concfile_path: str = typer.Argument(
             ...,
-            help="Path to talfile to edit."
+            help="Path to concfile to edit."
         )
 ):
     """
-    Removes excess array dimensions from a talfile's artifacts.
+    Removes excess array dimensions from a concfile's artifacts.
     """
     try:
-        # Load talfile.
-        print(f" > Loading {arg_talfile_path}... ", end="")
-        talfile = TalFile.read(arg_talfile_path)
+        # Load concfile.
+        print(f" > Loading {arg_concfile_path}... ", end="")
+        concfile = ConcreteFile.read(arg_concfile_path)
         print(f"[bold green]success![/]")
 
     except RuntimeError as ex:
-        print("[bold red]failed![/] Couldn't load .tal file. " + str(ex))
+        print("[bold red]failed![/] Couldn't load .conc file. " + str(ex))
         raise typer.Abort()
 
-    talfile.artifact_apply(lambda l: np.squeeze(l))
-    talfile.write(arg_talfile_path)
+    concfile.artifact_apply(lambda l: np.squeeze(l))
+    concfile.write(arg_concfile_path)
 
     print(f"Squeeze complete.")

@@ -6,17 +6,19 @@ from gymnasium.utils.play import play as gym_play
 from rich import print
 
 from crete.cli.cli_utils import _convert_to_key_value_list
-from crete.cli.list import app as list_app
+from crete.cli.list import list_app
 from crete.cli.module import module_app
-from crete.cli.talfile import talfile_app
+from crete.cli.concfile import concfile_app
 from crete.core import create_env_factory, create_agent, create_save_callback, load_extra_modules
+from crete.error import ProfilePropertyNotFound
 from crete.global_state import get_cli_state
 from crete.file.profile import read_profile, Profile
-from crete.file.concrete import TalFile
+from crete.file.concrete import ConcreteFile
+from crete.util import print_err, print_ex
 
 app = typer.Typer()
 app.add_typer(list_app, name="list")
-app.add_typer(talfile_app, name="talfile")
+app.add_typer(concfile_app, name="concfile")
 app.add_typer(module_app, name="module")
 
 __app_name__ = "talos"
@@ -85,6 +87,8 @@ def train(
             help="If false, don't run retrain profiles that already have an file."
         )
 ):
+    load_extra_modules()
+
     # Load config.
     try:
         print(f"Loading profiles `{arg_profile_path}`... ", end="")
@@ -212,6 +216,8 @@ def _train_with_profile(
         )
 
         training_wrapper(env_factory, agent, target_profile.config, training_artifacts, save_callback)
+    except ProfilePropertyNotFound as ex:
+        print_ex(ex)
     except KeyboardInterrupt:
         print("[bold red]Training interrupted[/bold red].")
 
@@ -222,7 +228,7 @@ def _train_with_profile(
     try:
         print(f"Saving agent to disk ([italic]{path}[/]) ...")
         data = agent.save()
-        talfile = TalFile(
+        concfile = ConcreteFile(
             id=target_profile.agent_id,
             env_name=target_profile.env_id,
             agent_data=data,
@@ -231,6 +237,6 @@ def _train_with_profile(
             config=target_profile.config.to_dict(),
             env_args=target_profile.env_args
         )
-        talfile.write(path)
+        concfile.write(path)
     except OSError as ex:
         print("[bold red]Saving failed![/] " + ex.strerror)

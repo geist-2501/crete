@@ -3,11 +3,11 @@ from typing import Any, Dict, List, Callable
 
 import numpy as np
 
-from crete.error import TalfileLoadError
+from crete.error import ConcfileLoadError
 
 
 @dataclass()
-class TalFile:
+class ConcreteFile:
     id: str
     agent_data: Any
 
@@ -92,4 +92,4 @@ class TalFile:
             with open(path, 'rb') as file:
                 raise NotImplementedError
         except OSError as ex:
-            raise TalfileLoadError(ex)
+            raise ConcfileLoadError(ex)

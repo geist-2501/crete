@@ -4,9 +4,19 @@ from rich import print
 
 import numpy as np
 
+from crete.error import CreteException
+
 
 def print_err(text: str):
     print(f"[bold red]Error[/]\t{text}")
+
+
+def print_ex(ex: CreteException):
+    text = f"[bold red]Exception\t{ex.name}[/]"
+    if ex.message is not None:
+        print(f"{text} | {ex.message}")
+    else:
+        print(text)
 
 
 def pad(array, pad_value=0) -> np.ndarray:
