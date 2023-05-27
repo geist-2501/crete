@@ -1,7 +1,11 @@
+import pickle
 from dataclasses import dataclass, field
+from io import BytesIO
 from typing import Any, Dict, List, Callable
+from zipfile import ZipFile
 
 import numpy as np
+import torch
 
 from crete.error import ConcfileLoadError
 
@@ -9,7 +13,7 @@ from crete.error import ConcfileLoadError
 @dataclass()
 class ConcreteFile:
     id: str
-    agent_data: Any
+    agent_data: bytes
 
     training_artifacts: Dict
     config: Dict
@@ -17,19 +21,32 @@ class ConcreteFile:
     env_name: str = None
     env_args: Dict = field(default_factory=dict)
 
+    @classmethod
+    def read(cls, path: str) -> Any:
+        try:
+            with ZipFile(path, 'r') as file:
+                meta_bytes = file.read("meta")
+                data_bytes = file.read("data")
+
+                meta = pickle.loads(meta_bytes)
+
+                return ConcreteFile(**{**meta, "agent_data": data_bytes})
+
+        except OSError as ex:
+            raise ConcfileLoadError(str(ex))
+
     def write(self, path: str):
-        with open(path, 'wb') as file:
-            ...
-            # TODO Redo this without pytorch.
-            # torch.save({
-            #     "id": self.id,
-            #     "agent_data": self.agent_data,
-            #     "training_artifacts": self.training_artifacts,
-            #     "config": self.config,
-            #     "used_wrappers": self.used_wrappers,
-            #     "env_name": self.env_name,
-            #     "env_args": self.env_args
-            # }, file)
+        with ZipFile(path, 'w') as file:
+            file_meta = pickle.dumps({
+                "id": self.id,
+                "training_artifacts": self.training_artifacts,
+                "config": self.config,
+                "used_wrappers": self.used_wrappers,
+                "env_name": self.env_name,
+                "env_args": self.env_args
+            })
+            file.writestr("meta", file_meta)
+            file.writestr("data", self.agent_data)
 
     def get_artifact(self, path: List[str]) -> Any:
         root = self.training_artifacts
@@ -85,11 +102,3 @@ class ConcreteFile:
                 self._set_artifact_rec(path, depth + 1, [*roots, new_root], data)
             else:
                 raise RuntimeError("Invalid path!")
-
-    @classmethod
-    def read(cls, path: str):
-        try:
-            with open(path, 'rb') as file:
-                raise NotImplementedError
-        except OSError as ex:
-            raise ConcfileLoadError(ex)

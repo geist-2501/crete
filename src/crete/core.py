@@ -260,7 +260,7 @@ def load_extra_modules():
     with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), transient=True) as progress:
         progress.add_task("Loading modules...", total=None)
         # Load .crete file.
-        config = CreteConfig.read(CreteConfig.conf_filename)
+        config = CreteConfig.try_read(CreteConfig.conf_filename)
 
         # Import modules to trigger registration.
         for extra_module in config.extra_modules:
