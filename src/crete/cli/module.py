@@ -7,6 +7,12 @@ from crete.util import print_err
 module_app = typer.Typer()
 
 
+@module_app.callback()
+def doc():
+    """Manage module registrations."""
+    pass
+
+
 @module_app.command()
 def add(
         arg_module_name: str = typer.Argument(
@@ -14,6 +20,10 @@ def add(
             help="Path of module to add for Crete to load."
         )
 ):
+    """
+    Add a module to the load list.
+    """
+
     # Load the .crete file.
     conf = CreteConfig.try_read(CreteConfig.conf_filename)
 
@@ -34,6 +44,10 @@ def remove(
             help="Path of module to add for Crete to load."
         )
 ):
+    """
+    Remove a module from the load list.
+    """
+
     # Load the .crete file.
     conf = CreteConfig.try_read(CreteConfig.conf_filename)
 
@@ -45,3 +59,15 @@ def remove(
 
     # Overwrite it.
     conf.write(CreteConfig.conf_filename)
+
+
+@module_app.command()
+def show():
+    """
+    Show all modules in the load list.
+    """
+
+    # Load the .crete file.
+    conf = CreteConfig.try_read(CreteConfig.conf_filename)
+
+    print(conf.extra_modules)

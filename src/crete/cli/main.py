@@ -87,6 +87,10 @@ def train(
             help="If false, don't run retrain profiles that already have an file."
         )
 ):
+    """
+    Train an agent on an environment.
+    """
+
     load_extra_modules()
 
     # Load config.
@@ -124,6 +128,10 @@ def batch(
             help="If false, don't run retrain profiles that already have an file."
         )
 ):
+    """
+    Train all configurations within a profile as a batch.
+    """
+
     load_extra_modules()
 
     # Load config.
@@ -165,9 +173,10 @@ def play(
             "--fps"
         )
 ):
+    """Play the environment as a human. (Not for procrastination!)"""
+
     load_extra_modules()
 
-    """Play the environment as a human. (Not for procrastination!)"""
     opt_env_args = _convert_to_key_value_list(opt_env_args)
 
     env_factory = create_env_factory(arg_env, opt_wrapper, render_mode='rgb_array', env_args=opt_env_args)

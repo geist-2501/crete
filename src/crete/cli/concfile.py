@@ -84,9 +84,10 @@ def replay(
             "-k"
         )
 ):
+    """Play the agent in the environment it was trained in."""
+
     load_extra_modules()
 
-    """Play the agent in the environment it was trained in."""
     opt_env_args = _convert_to_key_value_list(opt_env_args)
 
     try:
@@ -136,9 +137,10 @@ def replay(
 
 @concfile_app.command()
 def graph(path: str):
+    """Produce graphs of the agent gathered during training."""
+
     load_extra_modules()
 
-    """Produce graphs of the agent gathered during training."""
     try:
         concfile = ConcreteFile.read(path)
     except ConcfileLoadError as ex:
