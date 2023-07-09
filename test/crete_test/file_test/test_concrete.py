@@ -14,7 +14,7 @@ class TestConcrete(unittest.TestCase):
             config={}
         )
 
-        file_path = os.path.join(test_dir, "test_concfile.conc")
+        file_path = os.path.join(test_dir, "test_concfile.cnc")
         file.write(file_path)
         read_back_file: ConcreteFile = ConcreteFile.read(file_path)
 

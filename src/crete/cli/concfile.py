@@ -8,7 +8,7 @@ from rich import print
 from ..file.profile import ProfileConfig
 from .cli_utils import _convert_to_key_value_list
 from ..core import create_env_factory, create_agent, play_agent, evaluate_agents, graph_agent, graph_env_results, \
-    dump_scores_to_csv
+    dump_scores_to_csv, load_extra_modules
 from ..error import ConcfileLoadError, AgentNotFound
 from ..file.concrete import ConcreteFile
 
@@ -84,6 +84,8 @@ def replay(
             "-k"
         )
 ):
+    load_extra_modules()
+
     """Play the agent in the environment it was trained in."""
     opt_env_args = _convert_to_key_value_list(opt_env_args)
 
@@ -134,6 +136,8 @@ def replay(
 
 @concfile_app.command()
 def graph(path: str):
+    load_extra_modules()
+
     """Produce graphs of the agent gathered during training."""
     try:
         concfile = ConcreteFile.read(path)

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Tuple, Optional
+from typing import Any, Tuple, Optional
 
 import numpy as np
 
@@ -23,12 +23,12 @@ class Agent(ABC):
         return extra_state
 
     @abstractmethod
-    def save(self) -> Dict:
+    def save(self) -> bytes:
         """Extract all policy data."""
         pass
 
     @abstractmethod
-    def load(self, agent_data: Dict):
+    def load(self, agent_data: bytes):
         """Load policy data."""
         pass
 

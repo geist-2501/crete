@@ -1,3 +1,4 @@
+import pickle
 from operator import itemgetter
 from typing import Callable, Dict, Tuple, Any, List, Optional
 
@@ -86,14 +87,18 @@ class DQNAgent(Agent):
     def parameters(self):
         return self.net.parameters()
 
-    def save(self) -> Dict:
-        return {
+    def save(self) -> bytes:
+        data = {
             "data": self.net.state_dict(),
             "layers": self.net.hidden_layers
         }
 
-    def load(self, agent_data: Dict):
+        return pickle.dumps(data)
+
+    def load(self, agent_bytes: bytes):
+        agent_data = pickle.loads(agent_bytes)
         data, layers = itemgetter("data", "layers")(agent_data)
+
         self.net.set_hidden_layers(layers)
         self.target_net.set_hidden_layers(layers)
         self.net.load_state_dict(data)
@@ -258,6 +263,7 @@ def dqn_graphing_wrapper(artifacts, config: ProfileConfig):
         eval_freq=config.getint("eval_freq"),
         gather_freq=config.getint("gather_freq")
     )
+    plt.show()
 
 
 def dqn_training_wrapper(

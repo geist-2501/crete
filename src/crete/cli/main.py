@@ -21,8 +21,8 @@ app.add_typer(list_app, name="list")
 app.add_typer(concfile_app, name="concfile")
 app.add_typer(module_app, name="module")
 
-__app_name__ = "talos"
-__version__ = "0.1.0"
+__app_name__ = "crete"
+__version__ = "0.2.0"
 __app_logo__ = r"""
                _       
   ___ _ __ ___| |_ ___ 
@@ -95,7 +95,7 @@ def train(
         profiles = read_profile(arg_profile_path)
         print("[bold green]success![/]")
     except RuntimeError:
-        print("[bold green]failure![/]")
+        print("[bold red]failure![/]")
         raise typer.Abort()
 
     if arg_target_profile not in profiles:
@@ -184,7 +184,7 @@ def _train_with_profile(
 ):
 
     if save_path is None:
-        save_path = f"{target_profile.name}.tal"
+        save_path = f"{target_profile.name}.cnc"
 
     path = os.path.join(out_dir, save_path)
     if override is False and os.path.exists(path):

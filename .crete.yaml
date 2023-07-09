@@ -1,0 +1,5 @@
+config:
+  extra_modules:
+  - ext.agents
+  - ext.envs
+  - i.dont.exist

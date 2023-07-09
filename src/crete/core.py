@@ -34,7 +34,6 @@ def play_agent(
         action, extra_state = agent.get_action(obs, extra_state)
         next_obs, r, done, _, _ = env.step(action)
 
-        # Some agents require extra processing (looking at you, h-DQN).
         extra_state = agent.post_step(obs, action, next_obs, extra_state)
 
         obs = next_obs
@@ -267,4 +266,4 @@ def load_extra_modules():
             try:
                 importlib.import_module(extra_module)
             except ModuleNotFoundError as e:
-                print_err(f"Could not find {extra_module}.")
+                print_err(f"Could not find module {extra_module}.")
