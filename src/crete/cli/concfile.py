@@ -154,7 +154,7 @@ def graph(path: str):
 def compare(
         paths: List[str] = typer.Argument(
             None,
-            help="Concfiles of agents to compare against each other."
+            help="Concfiles of agents to compare against each other.cnc."
         ),
         opt_env_args: List[str] = typer.Option(
             [],
@@ -175,9 +175,11 @@ def compare(
         )
 ):
     """
-    Compare several agents against each other in an environment.
+    Compare several agents against each other.cnc in an environment.
     Agents must have a common environment, but can have different wrappers.
     """
+
+    load_extra_modules()
 
     opt_env_args = _convert_to_key_value_list(opt_env_args)
 
@@ -204,7 +206,7 @@ def compare(
             extra_info += f" with wrapper {concfile.used_wrappers}." if concfile.used_wrappers else "."
             print(f"[bold green]success![/] {extra_info}")
         except RuntimeError as ex:
-            print("[bold red]failed![/] Couldn't load .conc file. " + str(ex))
+            print("[bold red]failed![/] Couldn't load .cnc file. " + str(ex))
         except AgentNotFound:
             print("[bold red]failed![/] Couldn't find agent definition. Make sure it's been registered.")
 

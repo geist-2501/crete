@@ -203,23 +203,21 @@ def evaluate_agent(
 
 
 def create_save_callback(id: str, config: Dict, used_wrappers: str, env_name: str, env_args: Dict) -> Callable:
-    def callback(agent_data: Any, training_artifacts: Dict, step: int, prefix: str = None):
+    def callback(agent: Agent, training_artifacts: Dict, step: int, prefix: str = None):
         concfile = ConcreteFile(
             id=id,
-            agent_data=agent_data,
+            agent_data=agent.save(),
             training_artifacts=training_artifacts,
             config=config,
             used_wrappers=used_wrappers,
             env_name=env_name,
             env_args=env_args
         )
-        path_meta = "map-" + str(env_args["map_id"]) if "map_id" in env_args else "no-meta"
         filename_parts = [
             id,
             env_name,
-            path_meta,
             str(step),
-            "autosave.tal"
+            "autosave.cnc"
         ]
         if prefix:
             filename_parts.insert(0, prefix)

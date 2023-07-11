@@ -197,7 +197,7 @@ def _train_with_profile(
 
     path = os.path.join(out_dir, save_path)
     if override is False and os.path.exists(path):
-        print(f"Profile {target_profile.name} already exists! To overwrite, set override to true.")
+        print(f"Profile {target_profile.name} already exists! To overwrite, --override, or set an alias with --as")
         return
 
     env_factory = create_env_factory(
